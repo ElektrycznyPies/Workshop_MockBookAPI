@@ -1,7 +1,7 @@
 package pl.coderslab.controller;
 
 import org.springframework.stereotype.Service;
-import pl.coderslab.domain.Book;
+import pl.coderslab.model.Book;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

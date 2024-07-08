@@ -1,4 +1,4 @@
-package pl.coderslab.domain;
+package pl.coderslab.model;
 
 import java.util.List;
 

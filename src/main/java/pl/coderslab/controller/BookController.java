@@ -1,10 +1,8 @@
 package pl.coderslab.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.coderslab.domain.Book;
+import pl.coderslab.model.Book;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,13 +11,16 @@ import java.util.Optional;
 @RequestMapping("/books")
 public class BookController {
 
+    // wstrzyknięcie zależności
     private BookService bookService;
 
     public BookController(BookService bookService) {
         this.bookService = bookService;
     }
 
-// LISTA Z UŻYCIEM RESPONSEENTITY, POZWALA ZOBACZYĆ ODP. SERWERA 200 OK
+    // WYŚWIETL WSZYSTKIE
+
+    // LISTA Z UŻYCIEM RESPONSEENTITY, POZWALA ZOBACZYĆ ODP. SERWERA 200 OK
     @RequestMapping("")
     @ResponseBody
     public ResponseEntity<List<Book>> getList() {
@@ -27,16 +28,16 @@ public class BookController {
         return ResponseEntity.ok(books);
    }
 
-// KLASYCZNA LISTA
-//    @RequestMapping("")
-//    @ResponseBody
-//    public List<Book> getList() {
-//        List<Book> books = bookService.getBooks();
-//        return books;
-//    }
+    // KLASYCZNA LISTA
+    //    @RequestMapping("")
+    //    @ResponseBody
+    //    public List<Book> getList() {
+    //        List<Book> books = bookService.getBooks();
+    //        return books;
+    //    }
 
-    @RequestMapping("/books/{id}")
-    @ResponseBody
+    // WYŚWIETL 1 WEDŁUG ID
+    @RequestMapping("/{id}")
     public ResponseEntity<Book> get(@PathVariable Long id) {
         Optional<Book> bookOptional = bookService.get(id);
 
@@ -48,13 +49,40 @@ public class BookController {
         }
     }
 
+    // DODAJ KSIĄŻKĘ (CURLEM W JSON-ie)
     @PostMapping("")
     public void addBook(@RequestBody Book book) { // @RB potrzebne, by przerobić json na obiekt. Dodajemy json curlem
         bookService.add(book);
     }
-//SKŁADNIA DLA CURLA:
-// curl -X POST -i -H "Content-Type: application/json" -d '{"isbn":"34321","title":"Thinking in Java", "publisher":"Helion","type":"programming", "author":"Bruce Eckel"}' http://localhost:8080/books
+    //SKŁADNIA DLA CURLA:
+    // curl -X POST -i -H "Content-Type: application/json" -d '{"isbn":"34321","title":"Thinking in Java", "publisher":"Helion","type":"programming", "author":"Bruce Eckel"}' http://localhost:8080/books
 
+    // USUŃ KSIĄŻKĘ WG ID
+    @RequestMapping("/del/{id}")
+    public ResponseEntity<List<Book>> delete(@PathVariable Long id) {
+        Optional<Book> bookOptional = bookService.get(id);
+
+        if (bookOptional.isPresent()) {
+            bookService.delete(id);
+            List<Book> updatedBooks = bookService.getBooks(); // Call getList() directly
+            return ResponseEntity.ok(updatedBooks);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+    // ZMODYFIKUJ KSIĄŻKĘ WG CURLA
+    @PutMapping("")
+    @ResponseBody
+    public void updateBook(@RequestBody Book book) {
+        bookService.update(book);
+    }
+    // SKŁADNIA DLA CURLA:
+    // curl -X PUT -i -H "Content-Type: application/json" -d '{"id":2,"isbn":"666666","title":"Thinking in C#", "publisher":"IT Books","type":"programming", "author":"Bruce Eckel"}' http://localhost:8080/books
+
+
+    // TEST TOMCATA
     @RequestMapping("/hello")
     @ResponseBody
     public Book helloBook() {
