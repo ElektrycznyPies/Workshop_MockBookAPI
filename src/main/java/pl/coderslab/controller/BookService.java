@@ -1,10 +1,11 @@
 package pl.coderslab.controller;
 
+import org.springframework.stereotype.Service;
 import pl.coderslab.domain.Book;
-
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public interface BookService {
     List<Book> getBooks();
 
